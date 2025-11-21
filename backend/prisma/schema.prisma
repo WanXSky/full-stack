@@ -53,7 +53,7 @@ model CartItem {
 }
 
 model Order {
-  id          Int        @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   total_price Decimal     @db.Decimal(10,2)
   status      Status
   created_at  DateTime    @default(now())
