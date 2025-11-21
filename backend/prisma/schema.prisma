@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+  OWNER
+}
+
+enum Status {
+  PENDING
+  PAID
+  SHIPPED
+  DONE
+  CANCELLED
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String   @unique
+  password   String
+  role       Role
+  created_at DateTime @default(now())
+  updated_at DateTime @updated_at
+  cart       Cart?
+  orders     Order[]
+}
+
+model Cart {
+  id         Int        @id @default(autoincrement())
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updated_at
+  user       User       @relation(fields: [user_id], references: [id])
+  user_id    Int        @unique
+  cart_items CartItem[]
+}
+
+model CartItem {
+  id             Int      @id @default(autoincrement())
+  quantity       Int
+  price_at_time  Decimal   @db.Decimal(10,2)
+  cart           Cart      @relation(fields: [cart_id], references: [id])
+  cart_id        Int
+  product        Product   @relation(fields: [product_id], references: [id])
+  product_id     Int
+}
+
+model Order {
+  id          Int        @id @default(autoincrement())
+  total_price Decimal     @db.Decimal(10,2)
+  status      Status
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updated_at
+  user        User        @relation(fields: [user_id], references: [id])
+  user_id     Int
+  order_items OrderItem[]
+}
+
+model OrderItem {
+  id             Int      @id @default(autoincrement())
+  quantity       Int
+  price_at_time  Decimal   @db.Decimal(10,2)
+  order          Order     @relation(fields: [order_id], references: [id])
+  order_id       Int
+  product        Product   @relation(fields: [product_id], references: [id])
+  product_id     Int
+}
+
+model Product {
+  id          Int        @id @default(autoincrement())
+  name        String
+  price       Decimal     @db.Decimal(10,2)
+  image_url   String
+  stock       Int
+  description String?
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updated_at
+  cart_items  CartItem[]
+  order_items OrderItem[]
+}
