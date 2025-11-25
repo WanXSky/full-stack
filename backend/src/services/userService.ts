@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient, Prisma } from "@prisma/client"
 import { NotFoundError } from "../errors/notFoundError"
 
 const prisma = new PrismaClient()
@@ -34,8 +34,8 @@ export class User {
     }
     
     static async getAllUser(search?: string) {
-        const isSearch = search ? { name: { contains: search, mode: "insensitive" }} : {}
-        return await prisma.user.findmany({
+        const isSearch = search ? { name: { contains: search, mode: Prisma.QueryMode.insensitive }} : {}
+        return await prisma.user.findMany({
             where: isSearch,
             select: {
                 name: true,

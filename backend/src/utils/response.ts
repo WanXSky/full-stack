@@ -13,7 +13,7 @@ interface ErrorResponse {
   details?: unknown 
 }
 
-export function ok<T>(res: Response, data?: T, message: "Success") {
+export function ok<T>(res: Response, data: T, message: "Success") {
   const body: SuccessResponse<T> = {
     success: true,
     message,
@@ -22,7 +22,7 @@ export function ok<T>(res: Response, data?: T, message: "Success") {
   return res.status(200).json(body)
 }
 
-export function created<T>(res: Response, data?: <T>, message = "Created") {
+export function created<T>(res: Response, data?: T, message = "Created") {
   const body: SuccessResponse<T> = {
     success: true,
     message,
@@ -36,7 +36,7 @@ export function fail<T>(res: Response, message: string, statusCode = 400, errorC
     success: false,
     message,
     errorCode,
-    details?,
+    details,
   }
   return res.status(statusCode).json(body)
 }

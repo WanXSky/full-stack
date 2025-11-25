@@ -9,11 +9,11 @@ export class CartService {
     const cart = await prisma.cart.findUnique({
       where: { user_id: userId },
       include: {
+        user: true,
         cart_items: {
           include: { product: true }
         }
-      },
-      user: true
+      }
     })
 
     if (!cart) throw new NotFoundError("Cart Item")
@@ -67,6 +67,7 @@ export class CartService {
     const cart = await prisma.cart.findFirst({
       where: { user_id: userId }
     })
+    if(!cart) throw new NotFoundError("Cart")
     const item = await prisma.cartItem.findFirst({
       where: { cart_id: cart.id, product_id: productId }
     })
@@ -86,9 +87,10 @@ export class CartService {
   }
 
   static async deleteItem(userId: number, productId: number) {
-    const cart = await prisma.cart.findFrist({
+    const cart = await prisma.cart.findFirst({
       where: { user_id: userId }
     })
+    if(!cart) throw new NotFoundError('Cart')
     const item = await prisma.cartItem.findFirst({
       where: { cart_id: cart.id, product_id: productId }
     })

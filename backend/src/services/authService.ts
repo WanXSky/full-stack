@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import * as bcrypt from "bcrypt"
 import { generateToken } from "../utils/jwt"
+import { UnauthorizedError } from "../errors/unauthorizedError"
+import { ValidationError } from "../errors/validationError"
 
 const prisma = new PrismaClient()
 
@@ -9,9 +11,7 @@ export class AuthService {
         const existing = await prisma.user.findUnique({
             where: { email }
         })
-
-        if(existing) throw new Error("Email aleardy Used")
-        
+        if(existing) throw new ValidationError("Email aleardy Used")
         const hashedPassword = await bcrypt.hash(password, 12)
 
         const user = await prisma.user.create({
@@ -25,10 +25,9 @@ export class AuthService {
         const user = await prisma.user.findUnique({
             where: { email }
         })
-
+        if(!user) throw new ValidationError("Email or Password is Wrong")
         const isValid = await bcrypt.compare(password, user.password)
-
-        if(!user || !isValid) throw new Error("Email or Password is Wrong")
+        if(!isValid) throw new ValidationError("Email or Password is Wrong")
         
         const token = generateToken(user.id)
 

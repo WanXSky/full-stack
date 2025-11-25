@@ -1,11 +1,11 @@
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient, Prisma } from "@prisma/client"
 import { NotFoundError } from "../errors/notFoundError"
 
 const prisma = new PrismaClient()
 // /products && /product?search=Sepatu
 export class ProductService {
   static async getAll(search?: string) {
-    const isSearch = search ? { name: { contains: search, mode: "insensitive" } }: {}
+    const isSearch = search ? { name: { contains: search, mode: Prisma.QueryMode.insensitive } }: {}
     return await prisma.product.findMany({
       where: isSearch,
       select: {
